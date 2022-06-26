@@ -35,13 +35,13 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  dart_vlc: f6f41562e5113cb00b7fa275230ca0e68fef6311
+  dart_vlc: c0f66203d3839041d3dc263423b6f95877655222
   FlutterMacOS: 57701585bf7de1b3fc2bb61f6378d73bbdea8424
   path_provider_macos: 3c0c3b4b0d4a76d2bf989a913c2de869c5641a19
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
   VLCKit: 21651e881f19774ecf9a86ca2c2010859fe68a08
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
-PODFILE CHECKSUM: 8c964b9e244d5a164d139d9662699f51c649f908
+PODFILE CHECKSUM: 6eac6b3292e5142cfc23bdeb71848a40ec51c14c
 
 COCOAPODS: 1.11.3
