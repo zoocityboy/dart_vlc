@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'dart_vlc'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -25,13 +25,13 @@ A new flutter plugin project.
   }, {
     :name => 'Change VLCKit ID',
     :show_env_vars_in_log => true,
-    :script => 'install_name_tool -id "@executable_path/../Frameworks/VLCKit.framework/VLCKit" ${PODS_ROOT}/VLCKit/VLCKit.xcframework/macos-arm64_x86_64/VLCKit.framework/VLCKit',
+    :script => 'install_name_tool -id "@executable_path/../Frameworks/VLCKit.framework/VLCKit" ${PODS_ROOT}/VLCKit/VLCKit.framework/VLCKit',
     :execution_position => :before_compile
   }]
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*.{h,m,mm}'
   s.dependency 'FlutterMacOS'
-  s.dependency 'VLCKit', '~>3.3'
+  s.dependency 'VLCKit', '~>3.3.0'
   s.platform = :osx
   s.osx.deployment_target = '10.11'
   s.library = 'c++'
@@ -39,18 +39,15 @@ A new flutter plugin project.
     'DEFINES_MODULE' => 'YES',
     # Hack. We should restructure the common layer in a way that
     # the platform-specific plugins won't need the VLC headers anymore.
-    'HEADER_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/../core ${PODS_ROOT}/core_core/dart_vlc_core_packages/vlc-3.0.9.2/sdk/include ${PODS_ROOT}/core_core/dart_vlc_core_packages/libvlcpp-master ${PODS_ROOT}/core_core/dart_vlc_core_packages/dart_api-master',
-    'LIBRARY_SEARCH_PATHS' => '$(PODS_TARGET_SRCROOT)/deps/lib',
+    'HEADER_SEARCH_PATHS' => '$(inherited) $(PODS_TARGET_SRCROOT)/../core ${PODS_ROOT}/core_core/dart_vlc_core_packages/vlc-3.0.17.4/sdk/include ${PODS_ROOT}/core_core/dart_vlc_core_packages/libvlcpp-master ${PODS_ROOT}/core_core/dart_vlc_core_packages/dart_api-master',
+    'LIBRARY_SEARCH_PATHS' => '$(inherited) $(PODS_TARGET_SRCROOT)/deps/lib',
     'OTHER_CFLAGS' => [
       '-Wno-documentation',
     ],
     'OTHER_CXXFLAGS' => [
       '-Wno-documentation',
     ],
-    'OTHER_LDFLAGS' => [
-      '-ldart_vlc_core',
-      '-Wl,-force_load,${PODS_TARGET_SRCROOT}/deps/lib/libdart_vlc_core.a',
-    ],
+    'OTHER_LDFLAGS' => '$(inherited) -ldart_vlc_core -Wl,-force_load,${PODS_TARGET_SRCROOT}/deps/lib/libdart_vlc_core.a',
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
     'CLANG_CXX_LIBRARY' => 'libc++',
   }

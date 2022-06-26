@@ -40,7 +40,9 @@ struct Equalizer {
   std::vector<float> amps;
 };
 
-static void DestroyObject(void*, void* peer) { delete peer; }
+static void DestroyObject(void*, void* peer) { 
+  ::operator delete(peer);
+}
 
 }  // namespace DartObjects
 
