@@ -1,46 +1,131 @@
-import 'package:dart_vlc_ffi/src/media_source/media.dart';
+// ignore_for_file: comment_references
+
+import 'package:equatable/equatable.dart';
+
+import '../media_source/media.dart';
 
 /// State of a [Player] instance.
-class CurrentState {
+class CurrentState extends Equatable {
+  const CurrentState({
+    this.index,
+    this.media,
+    this.medias = const <Media>[],
+    this.isPlaylist = false,
+  });
+
   /// Index of currently playing [Media].
-  int? index;
+  final int? index;
 
   /// Currently playing [Media].
-  Media? media;
+  final Media? media;
 
   /// [List] of [Media] currently opened in the [Player] instance.
-  List<Media> medias = <Media>[];
+  final List<Media> medias;
 
   /// Whether a [Playlist] is opened or a [Media].
-  bool isPlaylist = false;
+  final bool isPlaylist;
+
+  @override
+  List<Object?> get props => [index, media, medias, isPlaylist];
+
+  CurrentState copyWith({
+    int? index,
+    Media? media,
+    List<Media>? medias,
+    bool? isPlaylist,
+  }) {
+    return CurrentState(
+      index: index ?? this.index,
+      media: media ?? this.media,
+      medias: medias ?? this.medias,
+      isPlaylist: isPlaylist ?? this.isPlaylist,
+    );
+  }
 }
 
 /// Position & duration state of a [Player] instance.
-class PositionState {
+class PositionState extends Equatable {
+  const PositionState({
+    this.position = Duration.zero,
+    this.duration = Duration.zero,
+  });
+
   /// Position of playback in [Duration] of currently playing [Media].
-  Duration? position = Duration.zero;
+  final Duration position;
 
   /// Length of currently playing [Media] in [Duration].
-  Duration? duration = Duration.zero;
+  final Duration duration;
+
+  @override
+  List<Object?> get props => [position, duration];
+
+  PositionState copyWith({
+    Duration? position,
+    Duration? duration,
+  }) {
+    return PositionState(
+      position: position ?? this.position,
+      duration: duration ?? this.duration,
+    );
+  }
 }
 
 /// Playback state of a [Player] instance.
-class PlaybackState {
+class PlaybackState extends Equatable {
+  const PlaybackState({
+    this.isPlaying = false,
+    this.isSeekable = true,
+    this.isCompleted = false,
+  });
+
   /// Whether [Player] instance is playing or not.
-  bool isPlaying = false;
+  final bool isPlaying;
 
   /// Whether [Player] instance is seekable or not.
-  bool isSeekable = true;
+  final bool isSeekable;
 
   /// Whether the current [Media] has ended playing or not.
-  bool isCompleted = false;
+  final bool isCompleted;
+
+  @override
+  List<Object?> get props => [isPlaying, isSeekable, isCompleted];
+
+  PlaybackState copyWith({
+    bool? isPlaying,
+    bool? isSeekable,
+    bool? isCompleted,
+  }) {
+    return PlaybackState(
+      isPlaying: isPlaying ?? this.isPlaying,
+      isSeekable: isSeekable ?? this.isSeekable,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
 }
 
 /// Volume & Rate state of a [Player] instance.
-class GeneralState {
+class GeneralState extends Equatable {
+  const GeneralState({
+    this.volume = 1,
+    this.rate = 1,
+  });
+
   /// Volume of [Player] instance.
-  double volume = 1.0;
+  final double volume;
 
   /// Rate of playback of [Player] instance.
-  double rate = 1.0;
+  final double rate;
+
+  @override
+  List<Object?> get props => [volume, rate];
+
+  GeneralState copyWith({
+    double? volume,
+    double? rate,
+  }) {
+    return GeneralState(
+      volume: volume ?? this.volume,
+      rate: rate ?? this.rate,
+    );
+  }
 }

@@ -13,3 +13,4 @@ libs
 # libVLC & libVLC++ Headers
 
 include
+CMakeFiles/

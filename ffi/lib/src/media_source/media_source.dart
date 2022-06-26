@@ -1,6 +1,11 @@
-import 'package:dart_vlc_ffi/src/enums/media_source_type.dart';
+import 'package:equatable/equatable.dart';
 
-/// Parent abstract class of [Media] and [Playlist].
-abstract class MediaSource {
-  MediaSourceType get mediaSourceType;
+import '../enums/media_source_type.dart';
+
+/// Parent abstract class of `Media` and `Playlist`.
+abstract class MediaSource extends Equatable {
+  const MediaSource({required this.mediaSourceType});
+  final MediaSourceType mediaSourceType;
+  @override
+  List<Object?> get props => [mediaSourceType];
 }

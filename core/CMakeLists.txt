@@ -1,15 +1,12 @@
 cmake_minimum_required(VERSION 3.23)
-
 set(CMAKE_CXX_STANDARD 17)
-message("...start...")
 if(APPLE)
-  message("SDKROOT: ${SDKROOT} ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-  set(CMAKE_VERBOSE_MAKEFILE ON)
   set(CMAKE_CXX_EXTENSIONS OFF)
   set(CMAKE_OSX_ARCHITECTURES "${CMAKE_HOST_SYSTEM_PROCESSOR}")
   set(CMAKE_C_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache C FLAGS deployment" FORCE)
   set(CMAKE_CXX_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache CXX FLAGS deployment" FORCE)
 endif()
+
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif()

@@ -1,4 +1,4 @@
-/// Predefined presets for [Equalizer].
+/// Predefined presets for `Equalizer`.
 enum EqualizerMode {
   flat,
   classical,

@@ -1,7 +1,9 @@
 import 'dart:ffi';
+
 import 'package:ffi/ffi.dart';
-import 'package:dart_vlc_ffi/src/internal/ffi.dart';
-import 'package:dart_vlc_ffi/src/media_source/media.dart';
+
+import 'internal/ffi.dart';
+import 'media_source/media.dart';
 
 /// Internally used class to avoid direct creation of the object of a [Broadcast] class.
 class _Broadcast extends Broadcast {}
@@ -22,6 +24,16 @@ class _Broadcast extends Broadcast {}
 /// );
 /// ```
 class BroadcastConfiguration {
+  const BroadcastConfiguration({
+    required this.access,
+    required this.mux,
+    required this.dst,
+    required this.vcodec,
+    required this.vb,
+    required this.acodec,
+    required this.ab,
+  });
+
   /// Type of access for [Broadcast] e.g. `http`.
   final String access;
 
@@ -42,16 +54,6 @@ class BroadcastConfiguration {
 
   /// Audio bitrate for transcoding the broadcast.
   final int ab;
-
-  const BroadcastConfiguration({
-    required this.access,
-    required this.mux,
-    required this.dst,
-    required this.vcodec,
-    required this.vb,
-    required this.acodec,
-    required this.ab,
-  });
 }
 
 /// Creates new [Broadcast] for a [Media].
@@ -89,14 +91,15 @@ abstract class Broadcast {
   late BroadcastConfiguration configuration;
 
   /// Creates a new [Broadcast] instance.
-  static Broadcast create(
-      {required int id,
-      required Media media,
-      required BroadcastConfiguration configuration}) {
-    Broadcast broadcast = new _Broadcast();
-    broadcast.id = id;
-    broadcast.media = media;
-    broadcast.configuration = configuration;
+  static Broadcast create({
+    required int id,
+    required Media media,
+    required BroadcastConfiguration configuration,
+  }) {
+    final Broadcast broadcast = _Broadcast()
+      ..id = id
+      ..media = media
+      ..configuration = configuration;
     final args = [
       id,
       media.mediaType.toString().toNativeUtf8(),
@@ -121,21 +124,21 @@ abstract class Broadcast {
       args[8] as Pointer<Utf8>,
       args[9] as int,
     );
-    args.forEach((element) {
+    for (final element in args) {
       if (element is Pointer<Utf8>) {
         calloc.free(element);
       }
-    });
+    }
     return broadcast;
   }
 
   /// Starts broadcasting the [Media].
   void start() {
-    BroadcastFFI.start(this.id);
+    BroadcastFFI.start(id);
   }
 
   /// Disposes this instance of [Broadcast].
   void dispose() {
-    BroadcastFFI.dispose(this.id);
+    BroadcastFFI.dispose(id);
   }
 }

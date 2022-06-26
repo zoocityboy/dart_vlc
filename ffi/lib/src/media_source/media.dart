@@ -1,11 +1,15 @@
-import 'dart:io';
+// ignore_for_file: comment_references
+
 import 'dart:ffi';
+import 'dart:io';
+
 import 'package:ffi/ffi.dart';
 import 'package:path/path.dart' as path;
-import 'package:dart_vlc_ffi/src/internal/ffi.dart';
-import 'package:dart_vlc_ffi/src/media_source/media_source.dart';
-import 'package:dart_vlc_ffi/src/enums/media_source_type.dart';
-import 'package:dart_vlc_ffi/src/enums/media_type.dart';
+
+import '../enums/media_source_type.dart';
+import '../enums/media_type.dart';
+import '../internal/ffi.dart';
+import 'media_source.dart';
 
 /// A media object to open inside a [Player].
 ///
@@ -34,35 +38,27 @@ import 'package:dart_vlc_ffi/src/enums/media_type.dart';
 /// );
 /// ```
 ///
-class Media implements MediaSource {
-  MediaSourceType get mediaSourceType => MediaSourceType.media;
-  final MediaType mediaType;
-  final String resource;
-  final Duration startTime;
-  final Duration stopTime;
-  final Map<String, String> metas;
-
+class Media extends MediaSource {
   const Media._({
     required this.mediaType,
     required this.resource,
     required this.metas,
-    this.startTime: Duration.zero,
-    this.stopTime: Duration.zero,
-  });
+    this.startTime = Duration.zero,
+    this.stopTime = Duration.zero,
+  }) : super(mediaSourceType: MediaSourceType.media);
 
   /// Makes [Media] object from a [File].
   factory Media.file(
     File file, {
-    bool parse: false,
-    Map<String, dynamic>? extras,
-    Duration timeout: const Duration(seconds: 10),
-    startTime: Duration.zero,
-    stopTime: Duration.zero,
+    bool parse = false,
+    Duration timeout = const Duration(seconds: 10),
+    Duration startTime = Duration.zero,
+    Duration stopTime = Duration.zero,
   }) {
     final media = Media._(
       mediaType: MediaType.file,
       resource: file.path,
-      metas: {},
+      metas: const {},
       startTime: startTime,
       stopTime: stopTime,
     );
@@ -75,17 +71,15 @@ class Media implements MediaSource {
   /// Makes [Media] object from url.
   factory Media.network(
     dynamic url, {
-    bool parse: false,
-    Map<String, dynamic>? extras,
-    Duration timeout: const Duration(seconds: 10),
-    startTime: Duration.zero,
-    stopTime: Duration.zero,
+    bool parse = false,
+    Duration timeout = const Duration(seconds: 10),
+    Duration startTime = Duration.zero,
+    Duration stopTime = Duration.zero,
   }) {
-    final resource = (url is Uri) ? url.toString() : url;
-    final Media media = Media._(
+    final media = Media._(
       mediaType: MediaType.network,
-      resource: resource,
-      metas: {},
+      resource: '$url',
+      metas: const {},
       startTime: startTime,
       stopTime: stopTime,
     );
@@ -96,22 +90,28 @@ class Media implements MediaSource {
   }
 
   /// Makes [Media] object from direct show.
-  factory Media.directShow(
-      {String? rawUrl,
-      Map<String, dynamic>? args,
-      String? vdev,
-      String? adev,
-      int? liveCaching}) {
+  factory Media.directShow({
+    String? rawUrl,
+    Map<String, dynamic>? args,
+    String? vdev,
+    String? adev,
+    int? liveCaching,
+  }) {
     final resourceUrl = rawUrl ??
-        _buildDirectShowUrl(args ??
-            {
-              'dshow-vdev': vdev,
-              'dshow-adev': adev,
-              'live-caching': liveCaching
-            });
+        _buildDirectShowUrl(
+          args ??
+              <String, dynamic>{
+                'dshow-vdev': vdev,
+                'dshow-adev': adev,
+                'live-caching': liveCaching
+              },
+        );
 
     return Media._(
-        mediaType: MediaType.directShow, resource: resourceUrl, metas: {});
+      mediaType: MediaType.directShow,
+      resource: resourceUrl,
+      metas: const {},
+    );
   }
 
   /// Makes [Media] object from assets.
@@ -123,7 +123,7 @@ class Media implements MediaSource {
   ///
   factory Media.asset(
     String asset, {
-    startTime: Duration.zero,
+    Duration startTime = Duration.zero,
   }) {
     String? assetPath;
     if (Platform.isWindows || Platform.isLinux) {
@@ -153,30 +153,37 @@ class Media implements MediaSource {
       );
     }
     if (assetPath == null) {
-      // TODO: Add Android support.
       throw UnimplementedError('The platform is not supported');
     }
     final url = Uri.file(assetPath, windows: Platform.isWindows);
     return Media._(
       mediaType: MediaType.asset,
       resource: url.toString(),
-      metas: {},
+      metas: const {},
       startTime: startTime,
     );
   }
+  // @override
+  // MediaSourceType get mediaSourceType => MediaSourceType.media;
+  final MediaType mediaType;
+  final String resource;
+  final Duration startTime;
+  final Duration stopTime;
+  final Map<String, String> metas;
 
   /// Parses the [Media] to retrieve [Media.metas].
   void parse(Duration timeout) {
-    final mediaTypeCStr = this.mediaType.toString().toNativeUtf8();
-    final resourceCStr = this.resource.toNativeUtf8();
-    Pointer<Pointer<Utf8>> metas = MediaFFI.parse(
+    final mediaTypeCStr = mediaType.toString().toNativeUtf8();
+    final resourceCStr = resource.toNativeUtf8();
+    final metas = MediaFFI.parse(
       this,
       mediaTypeCStr,
       resourceCStr,
       timeout.inMilliseconds,
     );
-    calloc.free(mediaTypeCStr);
-    calloc.free(resourceCStr);
+    calloc
+      ..free(mediaTypeCStr)
+      ..free(resourceCStr);
     // Keep this sorted alphabetically by key.
     this.metas['actors'] = metas.elementAt(0).value.toDartString();
     this.metas['album'] = metas.elementAt(1).value.toDartString();
@@ -206,23 +213,20 @@ class Media implements MediaSource {
 
   static String _buildDirectShowUrl(Map<String, dynamic> args) {
     return args.entries.fold(
-        'dshow://',
-        (prev, pair) =>
-            prev +
-            (pair.value != null
-                ? ' :${pair.key.toLowerCase()}=${pair.value}'
-                : ''));
+      'dshow://',
+      (prev, pair) =>
+          prev +
+          (pair.value != null
+              ? ' :${pair.key.toLowerCase()}=${pair.value}'
+              : ''),
+    );
   }
-
-  int get hashCode => mediaType.hashCode ^ resource.hashCode;
-
-  bool operator ==(Object other) =>
-      other is Media &&
-      other.mediaType == mediaType &&
-      other.resource == resource;
 
   @override
   String toString() => '[$mediaType]$resource';
+
+  @override
+  List<Object?> get props => [];
 }
 
 extension DurationExtension on Duration {
