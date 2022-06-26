@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:path/path.dart' as path;
 
-import '../enums/media_source_type.dart';
 import '../enums/media_type.dart';
 import '../internal/ffi.dart';
 import 'media_source.dart';
@@ -39,80 +38,74 @@ import 'media_source.dart';
 /// ```
 ///
 class Media extends MediaSource {
-  const Media._({
+  Media._({
     required this.mediaType,
     required this.resource,
     required this.metas,
     this.startTime = Duration.zero,
     this.stopTime = Duration.zero,
-  }) : super(mediaSourceType: MediaSourceType.media);
+    bool parse = false,
+    Duration? timeout,
+  }) {
+    if (parse && timeout != null) {
+      this.parse(timeout);
+    }
+  }
 
   /// Makes [Media] object from a [File].
-  factory Media.file(
+  Media.file(
     File file, {
     bool parse = false,
     Duration timeout = const Duration(seconds: 10),
     Duration startTime = Duration.zero,
     Duration stopTime = Duration.zero,
-  }) {
-    final media = Media._(
-      mediaType: MediaType.file,
-      resource: file.path,
-      metas: const {},
-      startTime: startTime,
-      stopTime: stopTime,
-    );
-    if (parse) {
-      media.parse(timeout);
-    }
-    return media;
-  }
+  }) : this._(
+          mediaType: MediaType.file,
+          resource: file.path,
+          metas: {},
+          startTime: startTime,
+          stopTime: stopTime,
+          timeout: timeout,
+          parse: parse,
+        );
 
   /// Makes [Media] object from url.
-  factory Media.network(
+  Media.network(
     dynamic url, {
     bool parse = false,
     Duration timeout = const Duration(seconds: 10),
     Duration startTime = Duration.zero,
     Duration stopTime = Duration.zero,
-  }) {
-    final media = Media._(
-      mediaType: MediaType.network,
-      resource: '$url',
-      metas: const {},
-      startTime: startTime,
-      stopTime: stopTime,
-    );
-    if (parse) {
-      media.parse(timeout);
-    }
-    return media;
-  }
+  }) : this._(
+          mediaType: MediaType.network,
+          resource: '$url',
+          metas: {},
+          startTime: startTime,
+          stopTime: stopTime,
+          parse: parse,
+          timeout: timeout,
+        );
 
   /// Makes [Media] object from direct show.
-  factory Media.directShow({
+  Media.directShow({
     String? rawUrl,
     Map<String, dynamic>? args,
     String? vdev,
     String? adev,
     int? liveCaching,
-  }) {
-    final resourceUrl = rawUrl ??
-        _buildDirectShowUrl(
-          args ??
-              <String, dynamic>{
-                'dshow-vdev': vdev,
-                'dshow-adev': adev,
-                'live-caching': liveCaching
-              },
+  }) : this._(
+          mediaType: MediaType.directShow,
+          resource: rawUrl ??
+              _buildDirectShowUrl(
+                args ??
+                    <String, dynamic>{
+                      'dshow-vdev': vdev,
+                      'dshow-adev': adev,
+                      'live-caching': liveCaching,
+                    },
+              ),
+          metas: {},
         );
-
-    return Media._(
-      mediaType: MediaType.directShow,
-      resource: resourceUrl,
-      metas: const {},
-    );
-  }
 
   /// Makes [Media] object from assets.
   ///
@@ -159,7 +152,7 @@ class Media extends MediaSource {
     return Media._(
       mediaType: MediaType.asset,
       resource: url.toString(),
-      metas: const {},
+      metas: {},
       startTime: startTime,
     );
   }
@@ -175,7 +168,7 @@ class Media extends MediaSource {
   void parse(Duration timeout) {
     final mediaTypeCStr = mediaType.toString().toNativeUtf8();
     final resourceCStr = resource.toNativeUtf8();
-    final metas = MediaFFI.parse(
+    final parsedMetas = MediaFFI.parse(
       this,
       mediaTypeCStr,
       resourceCStr,
@@ -184,31 +177,34 @@ class Media extends MediaSource {
     calloc
       ..free(mediaTypeCStr)
       ..free(resourceCStr);
+
     // Keep this sorted alphabetically by key.
-    this.metas['actors'] = metas.elementAt(0).value.toDartString();
-    this.metas['album'] = metas.elementAt(1).value.toDartString();
-    this.metas['albumArtist'] = metas.elementAt(2).value.toDartString();
-    this.metas['artist'] = metas.elementAt(3).value.toDartString();
-    this.metas['artworkUrl'] = metas.elementAt(4).value.toDartString();
-    this.metas['copyright'] = metas.elementAt(5).value.toDartString();
-    this.metas['date'] = metas.elementAt(6).value.toDartString();
-    this.metas['description'] = metas.elementAt(7).value.toDartString();
-    this.metas['director'] = metas.elementAt(8).value.toDartString();
-    this.metas['discNumber'] = metas.elementAt(9).value.toDartString();
-    this.metas['discTotal'] = metas.elementAt(10).value.toDartString();
-    this.metas['duration'] = metas.elementAt(11).value.toDartString();
-    this.metas['encodedBy'] = metas.elementAt(12).value.toDartString();
-    this.metas['episode'] = metas.elementAt(13).value.toDartString();
-    this.metas['genre'] = metas.elementAt(14).value.toDartString();
-    this.metas['language'] = metas.elementAt(15).value.toDartString();
-    this.metas['nowPlaying'] = metas.elementAt(16).value.toDartString();
-    this.metas['rating'] = metas.elementAt(17).value.toDartString();
-    this.metas['season'] = metas.elementAt(18).value.toDartString();
-    this.metas['settings'] = metas.elementAt(19).value.toDartString();
-    this.metas['title'] = metas.elementAt(20).value.toDartString();
-    this.metas['trackNumber'] = metas.elementAt(21).value.toDartString();
-    this.metas['trackTotal'] = metas.elementAt(22).value.toDartString();
-    this.metas['url'] = metas.elementAt(23).value.toDartString();
+    metas.addAll({
+      'actors': parsedMetas.elementAt(0).value.toDartString(),
+      'album': parsedMetas.elementAt(1).value.toDartString(),
+      'albumArtist': parsedMetas.elementAt(2).value.toDartString(),
+      'artist': parsedMetas.elementAt(3).value.toDartString(),
+      'artworkUrl': parsedMetas.elementAt(4).value.toDartString(),
+      'copyright': parsedMetas.elementAt(5).value.toDartString(),
+      'date': parsedMetas.elementAt(6).value.toDartString(),
+      'description': parsedMetas.elementAt(7).value.toDartString(),
+      'director': parsedMetas.elementAt(8).value.toDartString(),
+      'discNumber': parsedMetas.elementAt(9).value.toDartString(),
+      'discTotal': parsedMetas.elementAt(10).value.toDartString(),
+      'duration': parsedMetas.elementAt(11).value.toDartString(),
+      'encodedBy': parsedMetas.elementAt(12).value.toDartString(),
+      'episode': parsedMetas.elementAt(13).value.toDartString(),
+      'genre': parsedMetas.elementAt(14).value.toDartString(),
+      'language': parsedMetas.elementAt(15).value.toDartString(),
+      'nowPlaying': parsedMetas.elementAt(16).value.toDartString(),
+      'rating': parsedMetas.elementAt(17).value.toDartString(),
+      'season': parsedMetas.elementAt(18).value.toDartString(),
+      'settings': parsedMetas.elementAt(19).value.toDartString(),
+      'title': parsedMetas.elementAt(20).value.toDartString(),
+      'trackNumber': parsedMetas.elementAt(21).value.toDartString(),
+      'trackTotal': parsedMetas.elementAt(22).value.toDartString(),
+      'url': parsedMetas.elementAt(23).value.toDartString(),
+    });
   }
 
   static String _buildDirectShowUrl(Map<String, dynamic> args) {
