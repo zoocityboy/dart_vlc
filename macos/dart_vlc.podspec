@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'dart_vlc'
-  s.version          = '0.0.2'
+  s.version          = '0.0.3'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -20,9 +20,15 @@ A new flutter plugin project.
   }, {
     :name => 'Build common lib',
     :show_env_vars_in_log => true,
-    :script => 'cmake -Bcore_core ${PODS_TARGET_SRCROOT}/../core -DCMAKE_INSTALL_PREFIX:PATH=${PODS_TARGET_SRCROOT}/deps && pwd && make -C core_core install',
+    :script => 'cmake -Bcore_core '\
+    '${PODS_TARGET_SRCROOT}/../core '\
+    '-DCMAKE_INSTALL_PREFIX:PATH=${PODS_TARGET_SRCROOT}/deps '\
+    '-DCMAKE_SYSTEM_NAME=macOS && '\
+    'pwd && '\
+    'make -C core_core install',
     :execution_position => :before_compile
   }, {
+    
     :name => 'Change VLCKit ID',
     :show_env_vars_in_log => true,
     :script => 'install_name_tool -id "@executable_path/../Frameworks/VLCKit.framework/VLCKit" ${PODS_ROOT}/VLCKit/VLCKit.framework/VLCKit',

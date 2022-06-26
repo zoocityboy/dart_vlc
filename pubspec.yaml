@@ -35,3 +35,5 @@ flutter:
         pluginClass: DartVlcPlugin
       macos:
         pluginClass: DartVlcPlugin
+      ios:
+        pluginClass: DartVlcPlugin

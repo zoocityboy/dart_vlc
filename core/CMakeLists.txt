@@ -2,21 +2,13 @@
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif()
-set(CMAKE_CXX_STANDARD 17)
-
 if(WIN32)
   cmake_minimum_required(VERSION 3.22)
 else()
   cmake_minimum_required(VERSION 3.23)
 endif()
 
-if(APPLE)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-  set(CMAKE_OSX_ARCHITECTURES "${CMAKE_HOST_SYSTEM_PROCESSOR}")
-  set(CMAKE_C_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache C FLAGS deployment" FORCE)
-  set(CMAKE_CXX_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache CXX FLAGS deployment" FORCE)
-endif()
-
+set(CMAKE_CXX_STANDARD 17)
 set(LIBRARY_NAME dart_vlc_core)
 project(${LIBRARY_NAME} LANGUAGES C CXX)
 
@@ -33,6 +25,24 @@ set(LIBVLCPP_ARCHIVE "${CMAKE_CURRENT_SOURCE_DIR}/../bin/libvlcpp-${LIBVLCPP_VER
 set(LIBVLC_SOURCE "${PACKAGE_DIR}/vlc-${LIBVLC_VERSION}")
 set(DART_API_SOURCE "${PACKAGE_DIR}/dart_api-master")
 set(LIBVLCPP_SOURCE "${PACKAGE_DIR}/libvlcpp-master")
+
+# message(${CMAKE_SYSTEM_NAME})
+if(APPLE)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "macOS")
+    message("Build for macOS")
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_OSX_ARCHITECTURES "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    set(CMAKE_C_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache C FLAGS deployment" FORCE)
+    set(CMAKE_CXX_FLAGS "-arch arm64 -arch x86_64"  CACHE PATH "Cache CXX FLAGS deployment" FORCE)
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES "iOS")
+    message("Build for iOS")
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_OSX_ARCHITECTURES "arm64;i386;x86_64")
+    set(CMAKE_C_FLAGS "-arch arm64 -arch i386 -arch x86_64"  CACHE PATH "Cache C FLAGS deployment" FORCE)
+    set(CMAKE_CXX_FLAGS "-arch arm64 -arch i386 -arch x86_64"  CACHE PATH "Cache CXX FLAGS deployment" FORCE)
+  endif()
+endif()
+
 
 
 add_custom_target(LIBVLC_EXTRACT ALL)

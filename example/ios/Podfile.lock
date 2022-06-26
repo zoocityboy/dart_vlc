@@ -1,16 +1,16 @@
 PODS:
   - dart_vlc (0.0.1):
     - Flutter
-    - MobileVLCKit (~> 3.3.0)
+    - MobileVLCKit (= 3.3.17)
   - Flutter (1.0.0)
   - MobileVLCKit (3.3.17)
-  - path_provider (0.0.1):
+  - path_provider_ios (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - dart_vlc (from `.symlinks/plugins/dart_vlc/ios`)
   - Flutter (from `Flutter`)
-  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -21,15 +21,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/dart_vlc/ios"
   Flutter:
     :path: Flutter
-  path_provider:
-    :path: ".symlinks/plugins/path_provider/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
 
 SPEC CHECKSUMS:
-  dart_vlc: 53a2b8d12af1988c7205a483b6eb5c3e9a508ace
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  dart_vlc: 555ef60c7ae0705813c7f23230e0248920eeac3a
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   MobileVLCKit: c5dd1b0ae933dc9c2348099840e753496dcdd908
-  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
 
-PODFILE CHECKSUM: 50aa76992373c60a054bd41f03586771a9b1b1a0
+PODFILE CHECKSUM: 15aa27b3ef0390773b1828f206f198534d8a8b53
 
-COCOAPODS: 1.11.0
+COCOAPODS: 1.11.3

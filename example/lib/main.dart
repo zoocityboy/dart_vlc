@@ -105,20 +105,17 @@ class DartVLCExampleState extends State<DartVLCExample> {
         ),
         useMaterial3: true,
       ),
-      scrollBehavior: [
-        TargetPlatform.macOS,
-        TargetPlatform.linux,
-        TargetPlatform.windows
-      ].contains(defaultTargetPlatform)
-          ? const MaterialScrollBehavior().copyWith(
-              dragDevices: {
-                PointerDeviceKind.mouse,
-                PointerDeviceKind.touch,
-                PointerDeviceKind.stylus,
-                PointerDeviceKind.unknown
-              },
-            )
-          : const MaterialScrollBehavior(),
+      scrollBehavior:
+          [TargetPlatform.macOS, TargetPlatform.linux, TargetPlatform.windows].contains(defaultTargetPlatform)
+              ? const MaterialScrollBehavior().copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.stylus,
+                    PointerDeviceKind.unknown
+                  },
+                )
+              : const MaterialScrollBehavior(),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('dart_vlc'),
@@ -188,8 +185,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                           style: const TextStyle(
                                             fontSize: 14,
                                           ),
-                                          decoration:
-                                              const InputDecoration.collapsed(
+                                          decoration: const InputDecoration.collapsed(
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
@@ -235,8 +231,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                         ],
                                       ),
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
+                                        padding: const EdgeInsets.only(left: 10),
                                         child: ElevatedButton(
                                           onPressed: () {
                                             if (mediaType == MediaType.file) {
@@ -250,8 +245,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                                   ),
                                                 ),
                                               );
-                                            } else if (mediaType ==
-                                                MediaType.network) {
+                                            } else if (mediaType == MediaType.network) {
                                               medias.add(
                                                 Media.network(
                                                   controller.text,
@@ -363,10 +357,8 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                 color: Colors.transparent,
                               ),
                               Slider(
-                                max:
-                                    position.duration.inMilliseconds.toDouble(),
-                                value:
-                                    position.position.inMilliseconds.toDouble(),
+                                max: position.duration.inMilliseconds.toDouble(),
+                                value: position.position.inMilliseconds.toDouble(),
                                 onChanged: (double position) => player.seek(
                                   Duration(
                                     milliseconds: position.toInt(),
@@ -381,28 +373,16 @@ class DartVLCExampleState extends State<DartVLCExample> {
                               Table(
                                 children: [
                                   TableRow(
-                                    children: [
-                                      const Text('player.general.volume'),
-                                      Text('${general.volume}')
-                                    ],
+                                    children: [const Text('player.general.volume'), Text('${general.volume}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.general.rate'),
-                                      Text('${general.rate}')
-                                    ],
+                                    children: [const Text('player.general.rate'), Text('${general.rate}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.position.position'),
-                                      Text('${position.position}')
-                                    ],
+                                    children: [const Text('player.position.position'), Text('${position.position}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.position.duration'),
-                                      Text('${position.duration}')
-                                    ],
+                                    children: [const Text('player.position.duration'), Text('${position.duration}')],
                                   ),
                                   TableRow(
                                     children: [
@@ -411,10 +391,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                     ],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.playback.isPlaying'),
-                                      Text('${playback.isPlaying}')
-                                    ],
+                                    children: [const Text('player.playback.isPlaying'), Text('${playback.isPlaying}')],
                                   ),
                                   TableRow(
                                     children: [
@@ -423,34 +400,19 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                     ],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.current.index'),
-                                      Text('${current.index}')
-                                    ],
+                                    children: [const Text('player.current.index'), Text('${current.index}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.current.media'),
-                                      Text('${current.media}')
-                                    ],
+                                    children: [const Text('player.current.media'), Text('${current.media}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.current.medias'),
-                                      Text('${current.medias}')
-                                    ],
+                                    children: [const Text('player.current.medias'), Text('${current.medias}')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.videoDimensions'),
-                                      Text('$videoDimensions')
-                                    ],
+                                    children: [const Text('player.videoDimensions'), Text('$videoDimensions')],
                                   ),
                                   TableRow(
-                                    children: [
-                                      const Text('player.bufferingProgress'),
-                                      Text('$bufferingProgress')
-                                    ],
+                                    children: [const Text('player.bufferingProgress'), Text('$bufferingProgress')],
                                   ),
                                 ],
                               ),
@@ -516,8 +478,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                       ),
-                                      decoration:
-                                          const InputDecoration.collapsed(
+                                      decoration: const InputDecoration.collapsed(
                                         hintStyle: TextStyle(
                                           fontSize: 14,
                                         ),
@@ -570,8 +531,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                             File(metasController.text),
                                             parse: true,
                                           );
-                                        } else if (mediaType ==
-                                            MediaType.network) {
+                                        } else if (mediaType == MediaType.network) {
                                           metasMedia = Media.network(
                                             metasController.text,
                                             parse: true,
@@ -597,8 +557,7 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                 color: Colors.transparent,
                               ),
                               Text(
-                                const JsonEncoder.withIndent('    ')
-                                    .convert(metasMedia?.metas),
+                                const JsonEncoder.withIndent('    ').convert(metasMedia?.metas),
                               ),
                             ],
                           ),
