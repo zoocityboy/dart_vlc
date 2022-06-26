@@ -18,11 +18,12 @@
 
 // ignore_for_file: implementation_imports
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:dart_vlc_ffi/src/device.dart';
 import 'package:dart_vlc_ffi/src/player.dart';
 import 'package:dart_vlc_ffi/src/player_state/player_state.dart';
+import 'package:flutter/material.dart';
 
 class Control extends StatefulWidget {
   Control({
@@ -217,9 +218,8 @@ class ControlState extends State<Control> with SingleTickerProviderStateMixin {
                                   iconSize: 30,
                                   icon: Icon(Icons.replay_10),
                                   onPressed: () {
-                                    int positionInMilliseconds = player.position
-                                            .position?.inMilliseconds ??
-                                        0;
+                                    int positionInMilliseconds =
+                                        player.position.position.inMilliseconds;
                                     if (!(positionInMilliseconds - 10000)
                                         .isNegative)
                                       positionInMilliseconds -= 10000;
@@ -250,12 +250,10 @@ class ControlState extends State<Control> with SingleTickerProviderStateMixin {
                                   iconSize: 30,
                                   icon: Icon(Icons.forward_10),
                                   onPressed: () {
-                                    int durationInMilliseconds = player.position
-                                            .duration?.inMilliseconds ??
-                                        0;
-                                    int positionInMilliseconds = player.position
-                                            .position?.inMilliseconds ??
-                                        1;
+                                    int durationInMilliseconds =
+                                        player.position.duration.inMilliseconds;
+                                    int positionInMilliseconds =
+                                        player.position.position.inMilliseconds;
                                     if ((positionInMilliseconds + 10000) <=
                                         durationInMilliseconds) {
                                       positionInMilliseconds += 10000;

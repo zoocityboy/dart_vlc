@@ -6,15 +6,18 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+  dart_vlc:
+    path: ../
   flutter:
     sdk: flutter
+dev_dependencies:
+  zoo_lints: ^1.0.2
+dependency_overrides:
+  cupertino_icons: ^1.0.2
+  dart_vlc_ffi:
+    path: ../ffi
   dart_vlc:
     path: ../
 
-dependency_overrides:
-  dart_vlc_ffi:
-    path: ../ffi
-
-  cupertino_icons: ^1.0.2
 flutter:
   uses-material-design: true

@@ -1,15 +1,21 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'dart:convert';
-import 'package:flutter/material.dart';
+
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
-  runApp(DartVLCExample());
+  runApp(const DartVLCExample());
 }
 
 class DartVLCExample extends StatefulWidget {
+  const DartVLCExample({Key? key}) : super(key: key);
+
   @override
   DartVLCExampleState createState() => DartVLCExampleState();
 }
@@ -17,54 +23,54 @@ class DartVLCExample extends StatefulWidget {
 class DartVLCExampleState extends State<DartVLCExample> {
   Player player = Player(
     id: 0,
-    videoDimensions: VideoDimensions(640, 360),
+    videoDimensions: const VideoDimensions(640, 360),
     registerTexture: !Platform.isWindows,
   );
   MediaType mediaType = MediaType.file;
-  CurrentState current = CurrentState();
-  PositionState position = PositionState();
-  PlaybackState playback = PlaybackState();
-  GeneralState general = GeneralState();
-  VideoDimensions videoDimensions = VideoDimensions(0, 0);
+  CurrentState current = const CurrentState();
+  PositionState position = const PositionState();
+  PlaybackState playback = const PlaybackState();
+  GeneralState general = const GeneralState();
+  VideoDimensions videoDimensions = const VideoDimensions(0, 0);
   List<Media> medias = <Media>[];
   List<Device> devices = <Device>[];
   TextEditingController controller = TextEditingController();
   TextEditingController metasController = TextEditingController();
-  double bufferingProgress = 0.0;
+  double bufferingProgress = 0;
   Media? metasMedia;
 
   @override
   void initState() {
     super.initState();
-    if (this.mounted) {
-      this.player.currentStream.listen((current) {
-        this.setState(() => this.current = current);
+    if (mounted) {
+      player.currentStream.listen((current) {
+        setState(() => this.current = current);
       });
-      this.player.positionStream.listen((position) {
-        this.setState(() => this.position = position);
+      player.positionStream.listen((position) {
+        setState(() => this.position = position);
       });
-      this.player.playbackStream.listen((playback) {
-        this.setState(() => this.playback = playback);
+      player.playbackStream.listen((playback) {
+        setState(() => this.playback = playback);
       });
-      this.player.generalStream.listen((general) {
-        this.setState(() => this.general = general);
+      player.generalStream.listen((general) {
+        setState(() => this.general = general);
       });
-      this.player.videoDimensionsStream.listen((videoDimensions) {
-        this.setState(() => this.videoDimensions = videoDimensions);
+      player.videoDimensionsStream.listen((videoDimensions) {
+        setState(() => this.videoDimensions = videoDimensions);
       });
-      this.player.bufferingProgressStream.listen(
+      player.bufferingProgressStream.listen(
         (bufferingProgress) {
-          this.setState(() => this.bufferingProgress = bufferingProgress);
+          setState(() => this.bufferingProgress = bufferingProgress);
         },
       );
-      this.player.errorStream.listen((event) {
-        print('libvlc error.');
+      player.errorStream.listen((event) {
+        log('libvlc error.');
       });
-      this.devices = Devices.all;
-      Equalizer equalizer = Equalizer.createMode(EqualizerMode.live);
-      equalizer.setPreAmp(10.0);
-      equalizer.setBandAmp(31.25, 10.0);
-      this.player.setEqualizer(equalizer);
+      devices = Devices.all;
+      final equalizer = Equalizer.createMode(EqualizerMode.live)
+        ..setPreAmp(10)
+        ..setBandAmp(31.25, 10);
+      player.setEqualizer(equalizer);
     }
   }
 
@@ -72,9 +78,9 @@ class DartVLCExampleState extends State<DartVLCExample> {
   Widget build(BuildContext context) {
     bool isTablet;
     bool isPhone;
-    final double devicePixelRatio = ui.window.devicePixelRatio;
-    final double width = ui.window.physicalSize.width;
-    final double height = ui.window.physicalSize.height;
+    final devicePixelRatio = ui.window.devicePixelRatio;
+    final width = ui.window.physicalSize.width;
+    final height = ui.window.physicalSize.height;
     if (devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
       isTablet = true;
       isPhone = false;
@@ -86,6 +92,33 @@ class DartVLCExampleState extends State<DartVLCExample> {
       isPhone = true;
     }
     return MaterialApp(
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.light(
+          primary: Colors.blue.shade700,
+        ),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData.from(
+        colorScheme: const ColorScheme.dark(
+          primary: ui.Color.fromARGB(255, 54, 214, 115),
+          secondary: ui.Color.fromARGB(255, 157, 222, 182),
+        ),
+        useMaterial3: true,
+      ),
+      scrollBehavior: [
+        TargetPlatform.macOS,
+        TargetPlatform.linux,
+        TargetPlatform.windows
+      ].contains(defaultTargetPlatform)
+          ? const MaterialScrollBehavior().copyWith(
+              dragDevices: {
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.touch,
+                PointerDeviceKind.stylus,
+                PointerDeviceKind.unknown
+              },
+            )
+          : const MaterialScrollBehavior(),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('dart_vlc'),
@@ -93,30 +126,31 @@ class DartVLCExampleState extends State<DartVLCExample> {
         ),
         body: ListView(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4),
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Platform.isWindows
-                    ? NativeVideo(
-                        player: player,
-                        width: isPhone ? 320 : 640,
-                        height: isPhone ? 180 : 360,
-                        volumeThumbColor: Colors.blue,
-                        volumeActiveColor: Colors.blue,
-                        showControls: !isPhone,
-                      )
-                    : Video(
-                        player: player,
-                        width: isPhone ? 320 : 640,
-                        height: isPhone ? 180 : 360,
-                        volumeThumbColor: Colors.blue,
-                        volumeActiveColor: Colors.blue,
-                        showControls: !isPhone,
-                      ),
+                if (Platform.isWindows)
+                  NativeVideo(
+                    player: player,
+                    width: isPhone ? 320 : 640,
+                    height: isPhone ? 180 : 360,
+                    volumeThumbColor: Colors.blue,
+                    volumeActiveColor: Colors.blue,
+                    showControls: !isPhone,
+                  )
+                else
+                  Video(
+                    player: player,
+                    width: isPhone ? 320 : 640,
+                    height: isPhone ? 180 : 360,
+                    volumeThumbColor: Colors.blue,
+                    volumeActiveColor: Colors.blue,
+                    showControls: !isPhone,
+                  ),
               ],
             ),
             Row(
@@ -126,109 +160,110 @@ class DartVLCExampleState extends State<DartVLCExample> {
               children: [
                 Expanded(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isPhone) _controls(context, isPhone),
                       Card(
-                        elevation: 2.0,
-                        margin: const EdgeInsets.all(4.0),
+                        elevation: 2,
+                        margin: const EdgeInsets.all(4),
                         child: Container(
-                          margin: const EdgeInsets.all(16.0),
+                          margin: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                                   const Text('Playlist creation.'),
-                                  Divider(
-                                    height: 8.0,
+                                  const Divider(
+                                    height: 8,
                                     color: Colors.transparent,
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Expanded(
                                         child: TextField(
-                                          controller: this.controller,
-                                          cursorWidth: 1.0,
+                                          controller: controller,
+                                          cursorWidth: 1,
                                           autofocus: true,
                                           style: const TextStyle(
-                                            fontSize: 14.0,
+                                            fontSize: 14,
                                           ),
-                                          decoration: InputDecoration.collapsed(
-                                            hintStyle: const TextStyle(
-                                              fontSize: 14.0,
+                                          decoration:
+                                              const InputDecoration.collapsed(
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
                                             ),
                                             hintText: 'Enter Media path.',
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        width: 152.0,
-                                        child: DropdownButton<MediaType>(
-                                          value: this.mediaType,
-                                          onChanged: (mediaType) => this
-                                              .setState(() =>
-                                                  this.mediaType = mediaType!),
-                                          items: [
-                                            DropdownMenuItem<MediaType>(
-                                              value: MediaType.file,
-                                              child: Text(
-                                                MediaType.file.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 14.0,
-                                                ),
-                                              ),
-                                            ),
-                                            DropdownMenuItem<MediaType>(
-                                              value: MediaType.network,
-                                              child: Text(
-                                                MediaType.network.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 14.0,
-                                                ),
-                                              ),
-                                            ),
-                                            DropdownMenuItem<MediaType>(
-                                              value: MediaType.asset,
-                                              child: Text(
-                                                MediaType.asset.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 14.0,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                      DropdownButton<MediaType>(
+                                        value: mediaType,
+                                        elevation: 0,
+                                        underline: const SizedBox.shrink(),
+                                        onChanged: (mediaType) => setState(
+                                          () => this.mediaType = mediaType!,
                                         ),
+                                        items: [
+                                          DropdownMenuItem<MediaType>(
+                                            value: MediaType.file,
+                                            child: Text(
+                                              MediaType.file.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                          DropdownMenuItem<MediaType>(
+                                            value: MediaType.network,
+                                            child: Text(
+                                              MediaType.network.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                          DropdownMenuItem<MediaType>(
+                                            value: MediaType.asset,
+                                            child: Text(
+                                              MediaType.asset.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(left: 10.0),
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            if (this.mediaType ==
-                                                MediaType.file) {
-                                              this.medias.add(
-                                                    Media.file(
-                                                      File(
-                                                        controller.text
-                                                            .replaceAll(
-                                                                '"', ''),
-                                                      ),
+                                            if (mediaType == MediaType.file) {
+                                              medias.add(
+                                                Media.file(
+                                                  File(
+                                                    controller.text.replaceAll(
+                                                      '"',
+                                                      '',
                                                     ),
-                                                  );
-                                            } else if (this.mediaType ==
+                                                  ),
+                                                ),
+                                              );
+                                            } else if (mediaType ==
                                                 MediaType.network) {
-                                              this.medias.add(
-                                                    Media.network(
-                                                      controller.text,
-                                                    ),
-                                                  );
+                                              medias.add(
+                                                Media.network(
+                                                  controller.text,
+                                                ),
+                                              );
                                             }
-                                            this.setState(() {});
+                                            setState(() {});
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             'Add to Playlist',
                                             style: TextStyle(
-                                              fontSize: 14.0,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ),
@@ -236,28 +271,27 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                     ],
                                   ),
                                   const Divider(
-                                    height: 12.0,
+                                    height: 12,
                                   ),
                                   const Divider(
-                                    height: 8.0,
+                                    height: 8,
                                     color: Colors.transparent,
                                   ),
                                   const Text('Playlist'),
                                 ] +
-                                this
-                                    .medias
+                                medias
                                     .map(
                                       (media) => ListTile(
                                         title: Text(
                                           media.resource,
                                           style: const TextStyle(
-                                            fontSize: 14.0,
+                                            fontSize: 14,
                                           ),
                                         ),
                                         subtitle: Text(
                                           media.mediaType.toString(),
                                           style: const TextStyle(
-                                            fontSize: 14.0,
+                                            fontSize: 14,
                                           ),
                                         ),
                                       ),
@@ -265,40 +299,39 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                     .toList() +
                                 <Widget>[
                                   const Divider(
-                                    height: 8.0,
+                                    height: 8,
                                     color: Colors.transparent,
                                   ),
                                   Row(
                                     children: [
                                       ElevatedButton(
-                                        onPressed: () => this.setState(
+                                        onPressed: () => setState(
                                           () {
-                                            this.player.open(
-                                                  Playlist(
-                                                    medias: this.medias,
-                                                    playlistMode:
-                                                        PlaylistMode.single,
-                                                  ),
-                                                );
+                                            player.open(
+                                              Playlist(
+                                                medias: medias,
+                                              ),
+                                            );
                                           },
                                         ),
-                                        child: Text(
+                                        child: const Text(
                                           'Open into Player',
-                                          style: const TextStyle(
-                                            fontSize: 14.0,
+                                          style: TextStyle(
+                                            fontSize: 14,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12.0),
+                                      const SizedBox(width: 12),
                                       ElevatedButton(
                                         onPressed: () {
-                                          this.setState(
-                                              () => this.medias.clear());
+                                          setState(
+                                            () => medias.clear(),
+                                          );
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           'Clear the list',
-                                          style: const TextStyle(
-                                            fontSize: 14.0,
+                                          style: TextStyle(
+                                            fontSize: 14,
                                           ),
                                         ),
                                       ),
@@ -309,50 +342,40 @@ class DartVLCExampleState extends State<DartVLCExample> {
                         ),
                       ),
                       Card(
-                        elevation: 2.0,
-                        margin: const EdgeInsets.all(4.0),
+                        elevation: 2,
+                        margin: const EdgeInsets.all(4),
                         child: Container(
-                          margin: const EdgeInsets.all(16.0),
+                          margin: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Playback event listeners.'),
                               const Divider(
-                                height: 12.0,
+                                height: 12,
                                 color: Colors.transparent,
                               ),
                               const Divider(
-                                height: 12.0,
+                                height: 12,
                               ),
                               const Text('Playback position.'),
                               const Divider(
-                                height: 8.0,
+                                height: 8,
                                 color: Colors.transparent,
                               ),
                               Slider(
-                                min: 0,
-                                max: this
-                                        .position
-                                        .duration
-                                        ?.inMilliseconds
-                                        .toDouble() ??
-                                    1.0,
-                                value: this
-                                        .position
-                                        .position
-                                        ?.inMilliseconds
-                                        .toDouble() ??
-                                    0.0,
-                                onChanged: (double position) =>
-                                    this.player.seek(
-                                          Duration(
-                                            milliseconds: position.toInt(),
-                                          ),
-                                        ),
+                                max:
+                                    position.duration.inMilliseconds.toDouble(),
+                                value:
+                                    position.position.inMilliseconds.toDouble(),
+                                onChanged: (double position) => player.seek(
+                                  Duration(
+                                    milliseconds: position.toInt(),
+                                  ),
+                                ),
                               ),
                               const Text('Event streams.'),
                               const Divider(
-                                height: 8.0,
+                                height: 8,
                                 color: Colors.transparent,
                               ),
                               Table(
@@ -360,73 +383,73 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                   TableRow(
                                     children: [
                                       const Text('player.general.volume'),
-                                      Text('${this.general.volume}')
+                                      Text('${general.volume}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.general.rate'),
-                                      Text('${this.general.rate}')
+                                      Text('${general.rate}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.position.position'),
-                                      Text('${this.position.position}')
+                                      Text('${position.position}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.position.duration'),
-                                      Text('${this.position.duration}')
+                                      Text('${position.duration}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.playback.isCompleted'),
-                                      Text('${this.playback.isCompleted}')
+                                      Text('${playback.isCompleted}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.playback.isPlaying'),
-                                      Text('${this.playback.isPlaying}')
+                                      Text('${playback.isPlaying}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.playback.isSeekable'),
-                                      Text('${this.playback.isSeekable}')
+                                      Text('${playback.isSeekable}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.current.index'),
-                                      Text('${this.current.index}')
+                                      Text('${current.index}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.current.media'),
-                                      Text('${this.current.media}')
+                                      Text('${current.media}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.current.medias'),
-                                      Text('${this.current.medias}')
+                                      Text('${current.medias}')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.videoDimensions'),
-                                      Text('${this.videoDimensions}')
+                                      Text('$videoDimensions')
                                     ],
                                   ),
                                   TableRow(
                                     children: [
                                       const Text('player.bufferingProgress'),
-                                      Text('${this.bufferingProgress}')
+                                      Text('$bufferingProgress')
                                     ],
                                   ),
                                 ],
@@ -436,40 +459,38 @@ class DartVLCExampleState extends State<DartVLCExample> {
                         ),
                       ),
                       Card(
-                        elevation: 2.0,
-                        margin: const EdgeInsets.all(4.0),
+                        elevation: 2,
+                        margin: const EdgeInsets.all(4),
                         child: Container(
-                          margin: const EdgeInsets.all(16.0),
+                          margin: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
                                   Text('Playback devices.'),
                                   Divider(
-                                    height: 12.0,
+                                    height: 12,
                                     color: Colors.transparent,
                                   ),
                                   Divider(
-                                    height: 12.0,
+                                    height: 12,
                                   ),
                                 ] +
-                                this
-                                    .devices
+                                devices
                                     .map(
                                       (device) => ListTile(
                                         title: Text(
                                           device.name,
                                           style: const TextStyle(
-                                            fontSize: 14.0,
+                                            fontSize: 14,
                                           ),
                                         ),
                                         subtitle: Text(
                                           device.id,
                                           style: const TextStyle(
-                                            fontSize: 14.0,
+                                            fontSize: 14,
                                           ),
                                         ),
-                                        onTap: () =>
-                                            this.player.setDevice(device),
+                                        onTap: () => player.setDevice(device),
                                       ),
                                     )
                                     .toList(),
@@ -477,92 +498,91 @@ class DartVLCExampleState extends State<DartVLCExample> {
                         ),
                       ),
                       Card(
-                        elevation: 2.0,
-                        margin: const EdgeInsets.all(4.0),
+                        elevation: 2,
+                        margin: const EdgeInsets.all(4),
                         child: Container(
-                          margin: const EdgeInsets.all(16.0),
+                          margin: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Metas parsing.'),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     child: TextField(
-                                      controller: this.metasController,
-                                      cursorWidth: 1.0,
+                                      controller: metasController,
+                                      cursorWidth: 1,
                                       autofocus: true,
                                       style: const TextStyle(
-                                        fontSize: 14.0,
+                                        fontSize: 14,
                                       ),
-                                      decoration: InputDecoration.collapsed(
-                                        hintStyle: const TextStyle(
-                                          fontSize: 14.0,
+                                      decoration:
+                                          const InputDecoration.collapsed(
+                                        hintStyle: TextStyle(
+                                          fontSize: 14,
                                         ),
                                         hintText: 'Enter Media path.',
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    width: 152.0,
-                                    child: DropdownButton<MediaType>(
-                                      value: this.mediaType,
-                                      onChanged: (mediaType) => this.setState(
-                                          () => this.mediaType = mediaType!),
-                                      items: [
-                                        DropdownMenuItem<MediaType>(
-                                          value: MediaType.file,
-                                          child: Text(
-                                            MediaType.file.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 14.0,
-                                            ),
-                                          ),
-                                        ),
-                                        DropdownMenuItem<MediaType>(
-                                          value: MediaType.network,
-                                          child: Text(
-                                            MediaType.network.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 14.0,
-                                            ),
-                                          ),
-                                        ),
-                                        DropdownMenuItem<MediaType>(
-                                          value: MediaType.asset,
-                                          child: Text(
-                                            MediaType.asset.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 14.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  DropdownButton<MediaType>(
+                                    value: mediaType,
+                                    onChanged: (mediaType) => setState(
+                                      () => this.mediaType = mediaType!,
                                     ),
+                                    underline: const SizedBox.shrink(),
+                                    items: [
+                                      DropdownMenuItem<MediaType>(
+                                        value: MediaType.file,
+                                        child: Text(
+                                          MediaType.file.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                      DropdownMenuItem<MediaType>(
+                                        value: MediaType.network,
+                                        child: Text(
+                                          MediaType.network.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                      DropdownMenuItem<MediaType>(
+                                        value: MediaType.asset,
+                                        child: Text(
+                                          MediaType.asset.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(left: 16.0),
+                                    padding: const EdgeInsets.only(left: 16),
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        if (this.mediaType == MediaType.file) {
-                                          this.metasMedia = Media.file(
-                                            File(this.metasController.text),
+                                        if (mediaType == MediaType.file) {
+                                          metasMedia = Media.file(
+                                            File(metasController.text),
                                             parse: true,
                                           );
-                                        } else if (this.mediaType ==
+                                        } else if (mediaType ==
                                             MediaType.network) {
-                                          this.metasMedia = Media.network(
-                                            this.metasController.text,
+                                          metasMedia = Media.network(
+                                            metasController.text,
                                             parse: true,
                                           );
                                         }
-                                        this.setState(() {});
+                                        setState(() {});
                                       },
                                       child: const Text(
                                         'Parse',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -570,15 +590,15 @@ class DartVLCExampleState extends State<DartVLCExample> {
                                 ],
                               ),
                               const Divider(
-                                height: 12.0,
+                                height: 12,
                               ),
                               const Divider(
-                                height: 8.0,
+                                height: 8,
                                 color: Colors.transparent,
                               ),
                               Text(
-                                JsonEncoder.withIndent('    ')
-                                    .convert(this.metasMedia?.metas),
+                                const JsonEncoder.withIndent('    ')
+                                    .convert(metasMedia?.metas),
                               ),
                             ],
                           ),
@@ -591,7 +611,6 @@ class DartVLCExampleState extends State<DartVLCExample> {
                 if (isTablet)
                   Expanded(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _controls(context, isPhone),
@@ -609,121 +628,119 @@ class DartVLCExampleState extends State<DartVLCExample> {
 
   Widget _controls(BuildContext context, bool isPhone) {
     return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
+      elevation: 2,
+      margin: const EdgeInsets.all(4),
       child: Container(
-        margin: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Playback controls.'),
             const Divider(
-              height: 8.0,
+              height: 8,
               color: Colors.transparent,
             ),
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () => this.player.play(),
+                  onPressed: () => player.play(),
                   child: const Text(
                     'play',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () => this.player.pause(),
+                  onPressed: () => player.pause(),
                   child: const Text(
                     'pause',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () => this.player.playOrPause(),
+                  onPressed: () => player.playOrPause(),
                   child: const Text(
                     'playOrPause',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 12),
               ],
             ),
             const SizedBox(
-              height: 8.0,
+              height: 8,
             ),
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () => this.player.stop(),
+                  onPressed: () => player.stop(),
                   child: const Text(
                     'stop',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () => this.player.next(),
+                  onPressed: () => player.next(),
                   child: const Text(
                     'next',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12.0),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () => this.player.previous(),
+                  onPressed: () => player.previous(),
                   child: const Text(
                     'previous',
                     style: TextStyle(
-                      fontSize: 14.0,
+                      fontSize: 14,
                     ),
                   ),
                 ),
               ],
             ),
             const Divider(
-              height: 12.0,
+              height: 12,
               color: Colors.transparent,
             ),
             const Divider(
-              height: 12.0,
+              height: 12,
             ),
             const Text('Volume control.'),
             const Divider(
-              height: 8.0,
+              height: 8,
               color: Colors.transparent,
             ),
             Slider(
-              min: 0.0,
-              max: 1.0,
-              value: this.player.general.volume,
+              value: player.general.volume,
               onChanged: (volume) {
-                this.player.setVolume(volume);
-                this.setState(() {});
+                player.setVolume(volume);
+                setState(() {});
               },
             ),
             const Text('Playback rate control.'),
             const Divider(
-              height: 8.0,
+              height: 8,
               color: Colors.transparent,
             ),
             Slider(
               min: 0.5,
               max: 1.5,
-              value: this.player.general.rate,
+              value: player.general.rate,
               onChanged: (rate) {
-                this.player.setRate(rate);
-                this.setState(() {});
+                player.setRate(rate);
+                setState(() {});
               },
             ),
           ],
@@ -734,78 +751,75 @@ class DartVLCExampleState extends State<DartVLCExample> {
 
   Widget _playlist(BuildContext context) {
     return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
-              alignment: Alignment.topLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Playlist manipulation.'),
-                  Divider(
-                    height: 12.0,
-                    color: Colors.transparent,
-                  ),
-                  Divider(
-                    height: 12.0,
-                  ),
-                ],
-              ),
+      elevation: 2,
+      margin: const EdgeInsets.all(4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 16, top: 16),
+            alignment: Alignment.topLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('Playlist manipulation.'),
+                Divider(
+                  height: 12,
+                  color: Colors.transparent,
+                ),
+                Divider(
+                  height: 12,
+                ),
+              ],
             ),
-            Container(
-              height: 456.0,
-              child: ReorderableListView(
-                shrinkWrap: true,
-                onReorder: (int initialIndex, int finalIndex) async {
-                  /// 🙏🙏🙏
-                  /// In the name of God,
-                  /// With all due respect,
-                  /// I ask all Flutter engineers to please fix this issue.
-                  /// Peace.
-                  /// 🙏🙏🙏
-                  ///
-                  /// Issue:
-                  /// https://github.com/flutter/flutter/issues/24786
-                  /// Prevention:
-                  /// https://stackoverflow.com/a/54164333/12825435
-                  ///
-                  if (finalIndex > this.current.medias.length)
-                    finalIndex = this.current.medias.length;
-                  if (initialIndex < finalIndex) finalIndex--;
+          ),
+          SizedBox(
+            height: 456,
+            child: ReorderableListView(
+              shrinkWrap: true,
+              onReorder: (int initialIndex, int finalIndex) async {
+                /// 🙏🙏🙏
+                /// In the name of God,
+                /// With all due respect,
+                /// I ask all Flutter engineers to please fix this issue.
+                /// Peace.
+                /// 🙏🙏🙏
+                ///
+                /// Issue:
+                /// https://github.com/flutter/flutter/issues/24786
+                /// Prevention:
+                /// https://stackoverflow.com/a/54164333/12825435
+                ///
+                if (finalIndex > current.medias.length) {
+                  finalIndex = current.medias.length;
+                }
+                if (initialIndex < finalIndex) finalIndex--;
 
-                  this.player.move(initialIndex, finalIndex);
-                  this.setState(() {});
-                },
-                scrollDirection: Axis.vertical,
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                children: List.generate(
-                  this.current.medias.length,
-                  (int index) => ListTile(
-                    key: Key(index.toString()),
-                    leading: Text(
-                      index.toString(),
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                    title: Text(
-                      this.current.medias[index].resource,
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                    subtitle: Text(
-                      this.current.medias[index].mediaType.toString(),
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
+                player.move(initialIndex, finalIndex);
+                setState(() {});
+              },
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: List.generate(
+                current.medias.length,
+                (int index) => ListTile(
+                  key: Key(index.toString()),
+                  leading: Text(
+                    index.toString(),
+                    style: const TextStyle(fontSize: 14),
                   ),
-                  growable: true,
+                  title: Text(
+                    current.medias[index].resource,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  subtitle: Text(
+                    current.medias[index].mediaType.toString(),
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:ffi/ffi.dart';
-import 'package:dart_vlc_ffi/src/internal/ffi.dart';
-import 'package:dart_vlc_ffi/src/media_source/media.dart';
+
+import 'internal/ffi.dart';
+import 'media_source/media.dart';
 
 /// Internally used class to avoid direct creation of the object of a [Chromecast] class.
 class _Chromecast extends Chromecast {}
@@ -16,14 +17,15 @@ class Chromecast {
   late String ipAddress;
 
   /// Creates a new [Chromecast] instance.
-  static Future<Chromecast> create(
-      {required int id,
-      required Media media,
-      required String ipAddress}) async {
-    Chromecast chromecast = new _Chromecast();
-    chromecast.id = id;
-    chromecast.media = media;
-    chromecast.ipAddress = ipAddress;
+  static Future<Chromecast> create({
+    required int id,
+    required Media media,
+    required String ipAddress,
+  }) async {
+    final Chromecast chromecast = _Chromecast()
+      ..id = id
+      ..media = media
+      ..ipAddress = ipAddress;
     final mediaTypeCStr = media.mediaType.toString().toNativeUtf8();
     final mediaResourceCStr = media.resource.toNativeUtf8();
     final ipAddressCStr = ipAddress.toNativeUtf8();
@@ -33,19 +35,20 @@ class Chromecast {
       mediaResourceCStr,
       ipAddressCStr,
     );
-    calloc.free(mediaTypeCStr);
-    calloc.free(mediaResourceCStr);
-    calloc.free(ipAddressCStr);
+    calloc
+      ..free(mediaTypeCStr)
+      ..free(mediaResourceCStr)
+      ..free(ipAddressCStr);
     return chromecast;
   }
 
   /// Start sending [Media] content to chromecast
   void start() {
-    ChromecastFFI.start(this.id);
+    ChromecastFFI.start(id);
   }
 
   /// Disposes this instance of [Chromecast].
   void dispose() {
-    ChromecastFFI.dispose(this.id);
+    ChromecastFFI.dispose(id);
   }
 }

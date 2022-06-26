@@ -2,18 +2,18 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
-import 'package:ffi/ffi.dart';
-import 'package:dart_vlc_ffi/src/internal/dynamiclibrary.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/player.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/media.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/devices.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/equalizer.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/record.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/broadcast.dart';
-import 'package:dart_vlc_ffi/src/internal/typedefs/chromecast.dart';
+
+import '../media_source/media.dart';
 // Here for sending event callbacks.
-import 'package:dart_vlc_ffi/src/player.dart';
-import 'package:dart_vlc_ffi/src/media_source/media.dart';
+import '../player.dart';
+import 'dynamiclibrary.dart';
+import 'typedefs/broadcast.dart';
+import 'typedefs/chromecast.dart';
+import 'typedefs/devices.dart';
+import 'typedefs/equalizer.dart';
+import 'typedefs/media.dart';
+import 'typedefs/player.dart';
+import 'typedefs/record.dart';
 
 abstract class PlayerFFI {
   static final PlayerCreateDart create = dynamicLibrary
@@ -110,7 +110,8 @@ abstract class PlayerFFI {
 
   static final PlayerGetAudioTrackCountDart getAudioTrackCount = dynamicLibrary
       .lookup<NativeFunction<PlayerGetAudioTrackCountCXX>>(
-          'PlayerGetAudioTrackCount')
+        'PlayerGetAudioTrackCount',
+      )
       .asFunction();
 
   static final PlayerSetHWNDDart setHWND = dynamicLibrary
@@ -192,110 +193,142 @@ abstract class EqualizerFFI {
 
 bool isInitialized = false;
 void Function(int id, Uint8List frame) videoFrameCallback = (_, __) {};
-final ReceivePort receiver = new ReceivePort()
+final ReceivePort receiver = ReceivePort()
   ..asBroadcastStream()
-  ..listen((event) {
-    int id = event[0];
-    String type = event[1];
+  ..listen((dynamic data) {
+    final event = data as Map<String, dynamic>;
+    final id = event[0] as int;
+    final type = event[1] as String;
+    final player = players[id];
+    if (player == null) return;
     switch (type) {
       case 'playbackEvent':
         {
-          players[id]!.playback.isPlaying = event[2];
-          players[id]!.playback.isSeekable = event[3];
-          players[id]!.playback.isCompleted = false;
-          if (!players[id]!.playbackController.isClosed)
-            players[id]!.playbackController.add(players[id]!.playback);
+          final playback = player.playback.copyWith(
+            isPlaying: event[2] as bool,
+            isSeekable: event[3] as bool,
+            isCompleted: false,
+          );
+          player.playback = playback;
+          if (!player.playbackController.isClosed) {
+            player.playbackController.add(player.playback);
+          }
           break;
         }
       case 'positionEvent':
         {
-          players[id]!.position.position = Duration(milliseconds: event[3]);
-          players[id]!.position.duration = Duration(milliseconds: event[4]);
-          if (!players[id]!.positionController.isClosed)
-            players[id]!.positionController.add(players[id]!.position);
+          player.position = player.position.copyWith(
+            position: Duration(milliseconds: event[3] as int),
+            duration: Duration(milliseconds: event[4] as int),
+          );
+          if (!player.positionController.isClosed) {
+            player.positionController.add(player.position);
+          }
           break;
         }
       case 'completeEvent':
         {
-          players[id]!.playback.isCompleted = event[2];
-          if (!players[id]!.playbackController.isClosed)
-            players[id]!.playbackController.add(players[id]!.playback);
+          player.playback = player.playback.copyWith(
+            isCompleted: event[2] as bool,
+          );
+
+          if (!player.playbackController.isClosed) {
+            player.playbackController.add(player.playback);
+          }
           break;
         }
       case 'volumeEvent':
         {
-          players[id]!.general.volume = event[2];
-          if (!players[id]!.generalController.isClosed)
-            players[id]!.generalController.add(players[id]!.general);
+          player.general = player.general.copyWith(
+            volume: event[2] as double,
+          );
+          if (!player.generalController.isClosed) {
+            player.generalController.add(player.general);
+          }
           break;
         }
       case 'rateEvent':
         {
-          players[id]!.general.rate = event[2];
-          if (!players[id]!.generalController.isClosed)
-            players[id]!.generalController.add(players[id]!.general);
+          player.general = player.general.copyWith(
+            rate: event[2] as double,
+          );
+
+          if (!player.generalController.isClosed) {
+            player.generalController.add(player.general);
+          }
           break;
         }
       case 'openEvent':
         {
-          players[id]!.current.index = event[2];
-          players[id]!.current.isPlaylist = event[3];
-          assert(event[4].length == event[5].length);
-          int length = event[4].length;
-          List<Media> medias = [];
-          for (int index = 0; index < length; index++) {
-            switch (event[4][index]) {
+          player.current = player.current.copyWith(
+            index: event[2] as int,
+            isPlaylist: event[3] as bool,
+          );
+          final list1 = event[4] as List<String>;
+          final list2 = event[5] as List<String>;
+          assert(
+            list1.length == list2.length,
+            'list1 and list2 must be the same length',
+          );
+          final length = list1.length;
+          final medias = <Media>[];
+          for (var index = 0; index < length; index++) {
+            switch (list1[index]) {
               case 'MediaType.file':
                 {
-                  medias.add(Media.file(File(event[5][index])));
+                  medias.add(Media.file(File(list2[index])));
                   break;
                 }
               case 'MediaType.network':
                 {
-                  medias.add(Media.network(Uri.parse(event[5][index])));
+                  medias.add(Media.network(Uri.parse(list2[index])));
                   break;
                 }
               case 'MediaType.direct_show':
                 {
-                  medias.add(Media.directShow(rawUrl: event[5][index]));
+                  medias.add(Media.directShow(rawUrl: list2[index]));
                   break;
                 }
             }
           }
-          players[id]!.current.medias = medias;
-          players[id]!.current.media = medias[players[id]!.current.index!];
-          if (!players[id]!.currentController.isClosed)
-            players[id]!.currentController.add(players[id]!.current);
+          player.current = player.current.copyWith(
+            media: medias.elementAt(player.current.index!),
+            medias: medias,
+          );
+          if (!player.currentController.isClosed) {
+            player.currentController.add(player.current);
+          }
           break;
         }
       case 'videoDimensionsEvent':
         {
-          players[id]!.videoDimensions = VideoDimensions(event[2], event[3]);
-          if (!players[id]!.videoDimensionsController.isClosed)
-            players[id]!
-                .videoDimensionsController
-                .add(players[id]!.videoDimensions);
+          player.videoDimensions =
+              VideoDimensions(event[2] as int, event[3] as int);
+
+          if (!player.videoDimensionsController.isClosed) {
+            player.videoDimensionsController.add(player.videoDimensions);
+          }
           break;
         }
       case 'videoFrameEvent':
         {
-          videoFrameCallback(id, event[2]);
+          videoFrameCallback(id, event[2] as Uint8List);
           break;
         }
       case 'bufferingEvent':
         {
-          players[id]!.bufferingProgress = event[2];
-          if (!players[id]!.bufferingProgressController.isClosed)
-            players[id]!
-                .bufferingProgressController
-                .add(players[id]!.bufferingProgress);
+          player.bufferingProgress = event[2] as double;
+          if (!player.bufferingProgressController.isClosed) {
+            player.bufferingProgressController.add(player.bufferingProgress);
+          }
           break;
         }
       default:
         {
-          players[id]!.error = event[2];
-          if (!players[id]!.errorController.isClosed)
-            players[id]!.errorController.add(players[id]!.error);
+          player.error = '${event[2]}';
+          if (!player.errorController.isClosed) {
+            player.errorController.add(player.error);
+          }
           break;
         }
     }

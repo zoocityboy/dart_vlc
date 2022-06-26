@@ -1,8 +1,9 @@
-import 'package:dart_vlc_ffi/src/enums/playlist_mode.dart';
-import 'package:dart_vlc_ffi/src/internal/utils.dart';
-import 'package:dart_vlc_ffi/src/media_source/media.dart';
-import 'package:dart_vlc_ffi/src/media_source/media_source.dart';
-import 'package:dart_vlc_ffi/src/enums/media_source_type.dart';
+// ignore_for_file: comment_references
+
+import '../enums/media_source_type.dart';
+import '../enums/playlist_mode.dart';
+import 'media.dart';
+import 'media_source.dart';
 
 /// A playlist object to open inside a [Player.open].
 ///
@@ -24,23 +25,19 @@ import 'package:dart_vlc_ffi/src/enums/media_source_type.dart';
 /// );
 /// ```
 ///
-class Playlist implements MediaSource {
-  MediaSourceType get mediaSourceType => MediaSourceType.playlist;
+class Playlist extends MediaSource {
+  const Playlist({
+    required this.medias,
+    this.playlistMode = PlaylistMode.single,
+  }) : super(mediaSourceType: MediaSourceType.playlist);
 
   /// [List] of [Media] present in the playlist.
   final List<Media> medias;
   final PlaylistMode playlistMode;
 
-  const Playlist(
-      {required this.medias, this.playlistMode = PlaylistMode.single});
-
-  int get hashCode => medias.hashCode ^ playlistMode.hashCode;
-
-  bool operator ==(Object other) =>
-      other is Playlist &&
-      other.playlistMode == playlistMode &&
-      listEquals(other.medias, medias);
-
   @override
   String toString() => 'Playlist[${medias.length}]';
+
+  @override
+  List<Object?> get props => [mediaSourceType, playlistMode, medias];
 }

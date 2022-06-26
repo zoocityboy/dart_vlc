@@ -1,4 +1,6 @@
 ## 0.1.7
+- added linter rules, formated with zoo_lints
+## 0.1.7
 
 - Update equivalent Dart bindings.
 

@@ -18,15 +18,24 @@ class EqualizerStruct extends Struct {
 }
 
 typedef EqualizerCreateEmptyCXX = Pointer<EqualizerStruct> Function(
-    Handle object);
+  Handle object,
+);
 typedef EqualizerCreateEmptyDart = Pointer<EqualizerStruct> Function(
-    Object object);
+  Object object,
+);
 typedef EqualizerCreateModeCXX = Pointer<EqualizerStruct> Function(
-    Handle object, Int32 mode);
+  Handle object,
+  Int32 mode,
+);
 typedef EqualizerCreateModeDart = Pointer<EqualizerStruct> Function(
-    Object object, int mode);
+  Object object,
+  int mode,
+);
 typedef EqualizerSetBandAmpCXX = Void Function(Int32 id, Float band, Float amp);
 typedef EqualizerSetBandAmpDart = void Function(
-    int id, double band, double amp);
+  int id,
+  double band,
+  double amp,
+);
 typedef EqualizerSetPreAmpCXX = Void Function(Int32 id, Float amp);
 typedef EqualizerSetPreAmpDart = void Function(int id, double amp);

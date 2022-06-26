@@ -30,7 +30,9 @@
 .pub-cache/
 .pub/
 /build/
-
+**/macos/Podfile.lock
+**/macos/Flutter/.last_build_id
+**/macos/Flutter/.last_build_id
 # Web related
 lib/generated_plugin_registrant.dart
 
