@@ -1,7 +1,7 @@
 PODS:
   - dart_vlc (0.0.2):
     - FlutterMacOS
-    - VLCKit (~> 3.3.0)
+    - VLCKit (= 3.3.17)
   - FlutterMacOS (1.0.0)
   - path_provider_macos (0.0.1):
     - FlutterMacOS
@@ -35,7 +35,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  dart_vlc: c0f66203d3839041d3dc263423b6f95877655222
+  dart_vlc: 47547a74134f384ea518e2eb49c8a96a59c40823
   FlutterMacOS: 57701585bf7de1b3fc2bb61f6378d73bbdea8424
   path_provider_macos: 3c0c3b4b0d4a76d2bf989a913c2de869c5641a19
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
