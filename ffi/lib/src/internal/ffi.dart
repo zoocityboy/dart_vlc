@@ -16,97 +16,70 @@ import 'typedefs/player.dart';
 import 'typedefs/record.dart';
 
 abstract class PlayerFFI {
-  static final PlayerCreateDart create = dynamicLibrary
-      .lookup<NativeFunction<PlayerCreateCXX>>('PlayerCreate')
-      .asFunction();
+  static final PlayerCreateDart create =
+      dynamicLibrary.lookup<NativeFunction<PlayerCreateCXX>>('PlayerCreate').asFunction();
 
-  static final PlayerDisposeDart dispose = dynamicLibrary
-      .lookup<NativeFunction<PlayerDisposeCXX>>('PlayerDispose')
-      .asFunction();
+  static final PlayerDisposeDart dispose =
+      dynamicLibrary.lookup<NativeFunction<PlayerDisposeCXX>>('PlayerDispose').asFunction();
 
-  static final PlayerOpenDart open = dynamicLibrary
-      .lookup<NativeFunction<PlayerOpenCXX>>('PlayerOpen')
-      .asFunction();
+  static final PlayerOpenDart open = dynamicLibrary.lookup<NativeFunction<PlayerOpenCXX>>('PlayerOpen').asFunction();
 
-  static final PlayerTriggerDart play = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPlay')
-      .asFunction();
+  static final PlayerTriggerDart play =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPlay').asFunction();
 
-  static final PlayerTriggerDart pause = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPause')
-      .asFunction();
+  static final PlayerTriggerDart pause =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPause').asFunction();
 
-  static final PlayerTriggerDart playOrPause = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPlayOrPause')
-      .asFunction();
+  static final PlayerTriggerDart playOrPause =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPlayOrPause').asFunction();
 
-  static final PlayerTriggerDart stop = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerStop')
-      .asFunction();
+  static final PlayerTriggerDart stop =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerStop').asFunction();
 
-  static final PlayerTriggerDart next = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerNext')
-      .asFunction();
+  static final PlayerTriggerDart next =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerNext').asFunction();
 
-  static final PlayerTriggerDart previous = dynamicLibrary
-      .lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPrevious')
-      .asFunction();
+  static final PlayerTriggerDart previous =
+      dynamicLibrary.lookup<NativeFunction<PlayerTriggerCXX>>('PlayerPrevious').asFunction();
 
-  static final PlayerJumpToIndexDart jumpToIndex = dynamicLibrary
-      .lookup<NativeFunction<PlayerJumpToIndexCXX>>('PlayerJumpToIndex')
-      .asFunction();
+  static final PlayerJumpToIndexDart jumpToIndex =
+      dynamicLibrary.lookup<NativeFunction<PlayerJumpToIndexCXX>>('PlayerJumpToIndex').asFunction();
 
-  static final PlayerSeekDart seek = dynamicLibrary
-      .lookup<NativeFunction<PlayerSeekCXX>>('PlayerSeek')
-      .asFunction();
+  static final PlayerSeekDart seek = dynamicLibrary.lookup<NativeFunction<PlayerSeekCXX>>('PlayerSeek').asFunction();
 
-  static final PlayerSetVolumeDart setVolume = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetVolumeCXX>>('PlayerSetVolume')
-      .asFunction();
+  static final PlayerSetVolumeDart setVolume =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetVolumeCXX>>('PlayerSetVolume').asFunction();
 
-  static final PlayerSetRateDart setRate = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetRateCXX>>('PlayerSetRate')
-      .asFunction();
+  static final PlayerSetRateDart setRate =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetRateCXX>>('PlayerSetRate').asFunction();
 
-  static final PlayerSetUserAgentDart setUserAgent = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetUserAgentCXX>>('PlayerSetUserAgent')
-      .asFunction();
+  static final PlayerSetUserAgentDart setUserAgent =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetUserAgentCXX>>('PlayerSetUserAgent').asFunction();
 
-  static final PlayerSetEqualizerDart setEqualizer = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetEqualizerCXX>>('PlayerSetEqualizer')
-      .asFunction();
+  static final PlayerSetEqualizerDart setEqualizer =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetEqualizerCXX>>('PlayerSetEqualizer').asFunction();
 
-  static final PlayerSetDeviceDart setDevice = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetDeviceCXX>>('PlayerSetDevice')
-      .asFunction();
+  static final PlayerSetDeviceDart setDevice =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetDeviceCXX>>('PlayerSetDevice').asFunction();
 
-  static final PlayerSetPlaylistModeDart setPlaylistMode = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetPlaylistModeCXX>>('PlayerSetPlaylistMode')
-      .asFunction();
+  static final PlayerSetPlaylistModeDart setPlaylistMode =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetPlaylistModeCXX>>('PlayerSetPlaylistMode').asFunction();
 
-  static final PlayerAddDart add = dynamicLibrary
-      .lookup<NativeFunction<PlayerAddCXX>>('PlayerAdd')
-      .asFunction();
+  static final PlayerAddDart add = dynamicLibrary.lookup<NativeFunction<PlayerAddCXX>>('PlayerAdd').asFunction();
 
-  static final PlayerRemoveDart remove = dynamicLibrary
-      .lookup<NativeFunction<PlayerRemoveCXX>>('PlayerRemove')
-      .asFunction();
+  static final PlayerRemoveDart remove =
+      dynamicLibrary.lookup<NativeFunction<PlayerRemoveCXX>>('PlayerRemove').asFunction();
 
-  static final PlayerInsertDart insert = dynamicLibrary
-      .lookup<NativeFunction<PlayerInsertCXX>>('PlayerInsert')
-      .asFunction();
+  static final PlayerInsertDart insert =
+      dynamicLibrary.lookup<NativeFunction<PlayerInsertCXX>>('PlayerInsert').asFunction();
 
-  static final PlayerMoveDart move = dynamicLibrary
-      .lookup<NativeFunction<PlayerMoveCXX>>('PlayerMove')
-      .asFunction();
+  static final PlayerMoveDart move = dynamicLibrary.lookup<NativeFunction<PlayerMoveCXX>>('PlayerMove').asFunction();
 
-  static final PlayerTakeSnapshotDart takeSnapshot = dynamicLibrary
-      .lookup<NativeFunction<PlayerTakeSnapshotCXX>>('PlayerTakeSnapshot')
-      .asFunction();
+  static final PlayerTakeSnapshotDart takeSnapshot =
+      dynamicLibrary.lookup<NativeFunction<PlayerTakeSnapshotCXX>>('PlayerTakeSnapshot').asFunction();
 
-  static final PlayerSetAudioTrackDart setAudioTrack = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetAudioTrackCXX>>('PlayerSetAudioTrack')
-      .asFunction();
+  static final PlayerSetAudioTrackDart setAudioTrack =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetAudioTrackCXX>>('PlayerSetAudioTrack').asFunction();
 
   static final PlayerGetAudioTrackCountDart getAudioTrackCount = dynamicLibrary
       .lookup<NativeFunction<PlayerGetAudioTrackCountCXX>>(
@@ -114,81 +87,63 @@ abstract class PlayerFFI {
       )
       .asFunction();
 
-  static final PlayerSetHWNDDart setHWND = dynamicLibrary
-      .lookup<NativeFunction<PlayerSetHWNDCXX>>('PlayerSetHWND')
-      .asFunction();
+  static final PlayerSetHWNDDart setHWND =
+      dynamicLibrary.lookup<NativeFunction<PlayerSetHWNDCXX>>('PlayerSetHWND').asFunction();
 }
 
 abstract class MediaFFI {
-  static final MediaParseDart parse = dynamicLibrary
-      .lookup<NativeFunction<MediaParseCXX>>('MediaParse')
-      .asFunction();
+  static final MediaParseDart parse = dynamicLibrary.lookup<NativeFunction<MediaParseCXX>>('MediaParse').asFunction();
 }
 
 abstract class BroadcastFFI {
-  static final BroadcastCreateDart create = dynamicLibrary
-      .lookup<NativeFunction<BroadcastCreateCXX>>('BroadcastCreate')
-      .asFunction();
+  static final BroadcastCreateDart create =
+      dynamicLibrary.lookup<NativeFunction<BroadcastCreateCXX>>('BroadcastCreate').asFunction();
 
-  static final BroadcastStartDart start = dynamicLibrary
-      .lookup<NativeFunction<BroadcastStartCXX>>('BroadcastStart')
-      .asFunction();
+  static final BroadcastStartDart start =
+      dynamicLibrary.lookup<NativeFunction<BroadcastStartCXX>>('BroadcastStart').asFunction();
 
-  static final BroadcastDisposeDart dispose = dynamicLibrary
-      .lookup<NativeFunction<BroadcastDisposeCXX>>('BroadcastDispose')
-      .asFunction();
+  static final BroadcastDisposeDart dispose =
+      dynamicLibrary.lookup<NativeFunction<BroadcastDisposeCXX>>('BroadcastDispose').asFunction();
 }
 
 abstract class ChromecastFFI {
-  static final ChromecastCreateDart create = dynamicLibrary
-      .lookup<NativeFunction<ChromecastCreateCXX>>('ChromecastCreate')
-      .asFunction();
+  static final ChromecastCreateDart create =
+      dynamicLibrary.lookup<NativeFunction<ChromecastCreateCXX>>('ChromecastCreate').asFunction();
 
-  static final ChromecastStartDart start = dynamicLibrary
-      .lookup<NativeFunction<ChromecastStartCXX>>('ChromecastStart')
-      .asFunction();
+  static final ChromecastStartDart start =
+      dynamicLibrary.lookup<NativeFunction<ChromecastStartCXX>>('ChromecastStart').asFunction();
 
-  static final ChromecastDisposeDart dispose = dynamicLibrary
-      .lookup<NativeFunction<ChromecastDisposeCXX>>('ChromecastDispose')
-      .asFunction();
+  static final ChromecastDisposeDart dispose =
+      dynamicLibrary.lookup<NativeFunction<ChromecastDisposeCXX>>('ChromecastDispose').asFunction();
 }
 
 abstract class RecordFFI {
-  static final RecordCreateDart create = dynamicLibrary
-      .lookup<NativeFunction<RecordCreateCXX>>('RecordCreate')
-      .asFunction();
+  static final RecordCreateDart create =
+      dynamicLibrary.lookup<NativeFunction<RecordCreateCXX>>('RecordCreate').asFunction();
 
-  static final RecordStartDart start = dynamicLibrary
-      .lookup<NativeFunction<RecordStartCXX>>('RecordStart')
-      .asFunction();
+  static final RecordStartDart start =
+      dynamicLibrary.lookup<NativeFunction<RecordStartCXX>>('RecordStart').asFunction();
 
-  static final RecordDisposeDart dispose = dynamicLibrary
-      .lookup<NativeFunction<RecordDisposeCXX>>('RecordDispose')
-      .asFunction();
+  static final RecordDisposeDart dispose =
+      dynamicLibrary.lookup<NativeFunction<RecordDisposeCXX>>('RecordDispose').asFunction();
 }
 
 abstract class DevicesFFI {
-  static final DevicesAllDart all = dynamicLibrary
-      .lookup<NativeFunction<DevicesAllCXX>>('DevicesAll')
-      .asFunction();
+  static final DevicesAllDart all = dynamicLibrary.lookup<NativeFunction<DevicesAllCXX>>('DevicesAll').asFunction();
 }
 
 abstract class EqualizerFFI {
-  static final EqualizerCreateEmptyDart createEmpty = dynamicLibrary
-      .lookup<NativeFunction<EqualizerCreateEmptyCXX>>('EqualizerCreateEmpty')
-      .asFunction();
+  static final EqualizerCreateEmptyDart createEmpty =
+      dynamicLibrary.lookup<NativeFunction<EqualizerCreateEmptyCXX>>('EqualizerCreateEmpty').asFunction();
 
-  static final EqualizerCreateModeDart createMode = dynamicLibrary
-      .lookup<NativeFunction<EqualizerCreateModeCXX>>('EqualizerCreateMode')
-      .asFunction();
+  static final EqualizerCreateModeDart createMode =
+      dynamicLibrary.lookup<NativeFunction<EqualizerCreateModeCXX>>('EqualizerCreateMode').asFunction();
 
-  static final EqualizerSetBandAmpDart setBandAmp = dynamicLibrary
-      .lookup<NativeFunction<EqualizerSetBandAmpCXX>>('EqualizerSetBandAmp')
-      .asFunction();
+  static final EqualizerSetBandAmpDart setBandAmp =
+      dynamicLibrary.lookup<NativeFunction<EqualizerSetBandAmpCXX>>('EqualizerSetBandAmp').asFunction();
 
-  static final EqualizerSetPreAmpDart setPreAmp = dynamicLibrary
-      .lookup<NativeFunction<EqualizerSetPreAmpCXX>>('EqualizerSetPreAmp')
-      .asFunction();
+  static final EqualizerSetPreAmpDart setPreAmp =
+      dynamicLibrary.lookup<NativeFunction<EqualizerSetPreAmpCXX>>('EqualizerSetPreAmp').asFunction();
 }
 
 bool isInitialized = false;
@@ -196,7 +151,7 @@ void Function(int id, Uint8List frame) videoFrameCallback = (_, __) {};
 final ReceivePort receiver = ReceivePort()
   ..asBroadcastStream()
   ..listen((dynamic data) {
-    final event = data as Map<String, dynamic>;
+    final event = List<dynamic>.from(data);
     final id = event[0] as int;
     final type = event[1] as String;
     final player = players[id];
@@ -264,8 +219,8 @@ final ReceivePort receiver = ReceivePort()
             index: event[2] as int,
             isPlaylist: event[3] as bool,
           );
-          final list1 = event[4] as List<String>;
-          final list2 = event[5] as List<String>;
+          final list1 = List<String>.from(event[4]);
+          final list2 = List<String>.from(event[5]);
           assert(
             list1.length == list2.length,
             'list1 and list2 must be the same length',
@@ -302,8 +257,7 @@ final ReceivePort receiver = ReceivePort()
         }
       case 'videoDimensionsEvent':
         {
-          player.videoDimensions =
-              VideoDimensions(event[2] as int, event[3] as int);
+          player.videoDimensions = VideoDimensions(event[2] as int, event[3] as int);
 
           if (!player.videoDimensionsController.isClosed) {
             player.videoDimensionsController.add(player.videoDimensions);
